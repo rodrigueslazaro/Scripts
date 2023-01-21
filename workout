@@ -1,0 +1,39 @@
+#!/bin/sh
+
+assets="wassets"
+if [ -e "$assets/$1.workout" ]; then
+  IFS=$'\n' read -r -d '' -a content < "$assets/$1.workout"
+  workout="${content[*]}"
+  repetitions=${2:-1}
+  counter=0
+  IFS=' ' read -ra workout_array <<< "$workout"
+  for k in $(seq 1 $repetitions); do
+    for ((i=0; i<${#workout_array[@]}; i+=2)); do
+      workoutname=${workout_array[i+1]}
+      if [ "$workoutname" == "rest" ]; then
+        paplay $assets/end.mp3 &
+      else
+        paplay $assets/start.mp3 &
+      fi
+      for j in $(seq ${workout_array[i]} -1 1); do
+        clear
+        figlet -f digital "  $workoutname" | lolcat
+        figlet -f mono12 $j | lolcat
+        counter=$((counter+1))
+        sleep 1
+      done
+    done
+  done
+  paplay $assets/victory.mp3 &
+  clear
+  figlet -f mono9 "Level Up!" | lolcat
+  if [ -e "$assets/record.csv" ]; then
+    printf "$(date +"%Y-%m-%dT%T%z"),$1,$counter" >> $assets/record.csv
+  else
+    printf "date,type,time\n" >> $assets/record.csv
+    printf "$(date +"%Y-%m-%dT%T%z"),$1,$counter" >> $assets/record.csv
+  fi
+else
+    echo "Workout $1 does not exist!" >&2
+fi
+
