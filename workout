@@ -1,5 +1,18 @@
 #!/bin/sh
 
+# Simple workout timer script
+# Uses .workout files for sets
+# Uses .mp3 files for sound effects
+# Registers finished workouts in record.csv
+# Depends on figlet and paplay
+#
+# Use: workout name reps
+# Example: workout cardio 3
+# It will run the set in cardio.workout 3 times
+#
+# Just take a look at the .workout files to make
+# your own, they're pretty simple.
+
 assets="wassets"
 if [ -e "$assets/$1.workout" ]; then
   IFS=$'\n' read -r -d '' -a content < "$assets/$1.workout"
